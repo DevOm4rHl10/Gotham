@@ -9,6 +9,7 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/scripts", StaticFiles(directory="scripts"), name="scripts")
+app.mount("/data", StaticFiles(directory="data"), name="data")
 templates = Jinja2Templates(directory="templates")
 
 

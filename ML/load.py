@@ -5,7 +5,7 @@ import json
 
 
 #Should also load for the other months, but for now just load for November 2025
-with open('/.gitignore/data/crimes_2025-11.json', 'r') as file:
+with open('data/crimes_2025-11.json', 'r') as file:
     data = json.load(file)
 
 coords = [
@@ -15,6 +15,3 @@ coords = [
 ]
 
 X = np.array(coords)
-
-
-print(X[:5])  # Print the first 5 coordinates to verify
