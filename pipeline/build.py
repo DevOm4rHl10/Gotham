@@ -75,6 +75,45 @@ def _top_cat(df, prefix):
     return t.rename(columns={f"{prefix}q": "q", f"{prefix}r": "r", "cat": "top"})[["q", "r", "top"]]
 
 
+def _zones(cells, df):
+    """Group significant street-level cells into named, ranked hotspot zones.
+
+    cells: per-cell table with q, r, score, crimes, sig (from _hotspots)
+    df:    the crime records those cells were built from
+    """
+    hot = cells[cells["sig"]].reset_index(drop=True)
+    if not len(hot):
+        return []
+    hot["zone"] = stats.split_zones(hot["q"].to_numpy(), hot["r"].to_numpy(),
+                                    hot["score"].to_numpy(), MAX_ZONE_CELLS)
+    hot = hot[hot["zone"] >= 0]
+    in_zone = df.merge(hot[["q", "r", "zone"]], left_on=["sq", "sr"], right_on=["q", "r"])
+    place_of = (in_zone[in_zone["place"] != ""].groupby(["sq", "sr"])["place"]
+                .agg(lambda s: Counter(s).most_common(1)[0][0]))
+    subs = dict(tuple(in_zone.groupby("zone")))
+    zones = []
+    for zid, part in hot.groupby("zone"):
+        cells_z = list(zip(part["q"], part["r"]))
+        sub = subs[zid]
+        harm_by_cat = sub[sub["weight"] > 0].groupby("cat")["weight"].sum().sort_values(ascending=False)
+        peak = part.loc[part["score"].idxmax()]
+        name = place_of.get((peak["q"], peak["r"]), "") or "Unnamed area"
+        cxz, cyz = grid.cell_center(part["q"], part["r"], DETAIL_SIZE)
+        lat, lng = grid.unproject(cxz.mean(), cyz.mean())
+        zones.append({
+            "name": name,
+            "score": _r(part["score"].sum(), 0),
+            "crimes": int(part["crimes"].sum()),
+            "area": _r(len(cells_z) * grid.cell_area_km2(DETAIL_SIZE), 2),
+            "center": [_r(lat, 5), _r(lng, 5)],
+            "cats": [[int(c), _r(100 * v / harm_by_cat.sum(), 0)] for c, v in harm_by_cat.head(3).items()],
+            "force": Counter(sub["force"]).most_common(1)[0][0],
+            "cells": [[int(q), int(r)] for q, r in cells_z],
+        })
+    zones.sort(key=lambda z: z["score"], reverse=True)
+    return zones
+
+
 def build(df, out, demo=False):
     if out.exists():
         shutil.rmtree(out)
@@ -107,9 +146,10 @@ def build(df, out, demo=False):
 
     # ---- street view, whole period, with stability across months
     detail = _hotspots(_per_cell(df, "s"), "score")
-    monthly_sig = []
+    monthly_sig, monthly_cells = [], []
     for m in months:
         cm = _hotspots(_per_cell(df[df["month"] == m], "s"), "score")
+        monthly_cells.append(cm)
         monthly_sig.append(set(zip(cm.loc[cm["sig"], "q"], cm.loc[cm["sig"], "r"])))
     stability = [stats.jaccard(a, b) for a, b in zip(monthly_sig, monthly_sig[1:])]
 
@@ -137,36 +177,17 @@ def build(df, out, demo=False):
     _write(out / "detail" / "index.json", {"chunk": CHUNK_METRES, "tiles": sorted(detail["chunk"].unique())})
 
     # ---- hotspot zones: connected significant street-level cells
-    hot = detail[detail["sig"]].reset_index(drop=True)
-    zones = []
-    if len(hot):
-        hot["zone"] = stats.split_zones(hot["q"].to_numpy(), hot["r"].to_numpy(),
-                                        hot["score"].to_numpy(), MAX_ZONE_CELLS)
-        hot = hot[hot["zone"] >= 0]
-        in_zone = df.merge(hot[["q", "r", "zone"]], left_on=["sq", "sr"], right_on=["q", "r"])
-        place_of = (in_zone[in_zone["place"] != ""].groupby(["sq", "sr"])["place"]
-                    .agg(lambda s: Counter(s).most_common(1)[0][0]))
-        subs = dict(tuple(in_zone.groupby("zone")))
-        for zid, part in hot.groupby("zone"):
-            cells = list(zip(part["q"], part["r"]))
-            sub = subs[zid]
-            harm_by_cat = sub[sub["weight"] > 0].groupby("cat")["weight"].sum().sort_values(ascending=False)
-            peak = part.loc[part["score"].idxmax()]
-            name = place_of.get((peak["q"], peak["r"]), "") or "Unnamed area"
-            cxz, cyz = grid.cell_center(part["q"], part["r"], DETAIL_SIZE)
-            lat, lng = grid.unproject(cxz.mean(), cyz.mean())
-            zones.append({
-                "name": name,
-                "score": _r(part["score"].sum(), 0),
-                "crimes": int(part["crimes"].sum()),
-                "area": _r(len(cells) * grid.cell_area_km2(DETAIL_SIZE), 2),
-                "center": [_r(lat, 5), _r(lng, 5)],
-                "cats": [[int(c), _r(100 * v / harm_by_cat.sum(), 0)] for c, v in harm_by_cat.head(3).items()],
-                "force": Counter(sub["force"]).most_common(1)[0][0],
-                "cells": [[int(q), int(r)] for q, r in cells],
-            })
-    zones.sort(key=lambda z: z["score"], reverse=True)
+    zones = _zones(detail, df)
     _write(out / "zones.json", {"size": DETAIL_SIZE, "zones": zones[:100]})
+
+    # ---- the same ranking for each single month, to see whether hotspots move
+    overall_top = {tuple(c) for z in zones[:10] for c in z["cells"]}
+    for m, cm, totals in zip(months, monthly_cells, month_totals):
+        mz = _zones(cm, df[df["month"] == m])
+        _write(out / "zones" / f"{m}.json", {"size": DETAIL_SIZE, "zones": mz[:100]})
+        # how many of this month's top 10 share ground with the 12-month top 10
+        totals["top10_overlap"] = sum(any(tuple(c) in overall_top for c in z["cells"]) for z in mz[:10])
+        totals["top10_count"] = min(10, len(mz))
 
     # ---- quality metrics and coverage
     scores = np.sort(detail["score"].to_numpy())[::-1]

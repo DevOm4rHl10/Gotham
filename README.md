@@ -14,6 +14,8 @@ The site is fully static (HTML, CSS, JavaScript and JSON files). It has no serve
 
 - [Features](#features)
 - [How it works](#how-it-works)
+- [Do hotspots move over time?](#do-hotspots-move-over-time)
+- [Design: British road signs](#design-british-road-signs)
 - [Project structure](#project-structure)
 - [Run it locally](#run-it-locally)
 - [Deploy for free](#deploy-for-free)
@@ -27,10 +29,12 @@ The site is fully static (HTML, CSS, JavaScript and JSON files). It has no serve
 ## Features
 
 - **National view:** 1.6 km hexagons coloured by average monthly harm per km².
-- **Street view:** zoom in and the map switches to 400 m hexagons. They load tile by tile, so the page stays fast.
-- **Tested hotspots:** outlined areas passed a statistical test (Getis-Ord Gi\*), not just a visual threshold.
+- **Street view:** zoom in and the map switches to 400 m hexagons, loaded only for the area you're looking at.
+- **Fast:** built on Leaflet. Hexagons are drawn once per map tile, so panning just moves images around.
+- **Tested hotspots:** marked with numbered warning triangles and outlined. Each passed a statistical test (Getis-Ord Gi\*), not just a visual threshold.
+- **Readable at street level:** zoomed in, hexagons fade to a soft tint so street names stay visible.
 - **Ranked list:** the worst hotspots, named by their most common street and area. Select one to fly to it on the map.
-- **Month selector:** a bar chart of monthly harm. Click a month to show it alone.
+- **Two views:** *All 12 months* ranks hotspots over the whole year. *Month by month* ranks them for each single month, with a slider you drag through the year, so you can see whether hotspots move.
 - **Area details:** click any hexagon to see its harm, crime count, top crime types and a 12-month trend.
 - **Honest about gaps:** forces that publish no data are labelled on the map instead of looking crime-free.
 - **Works on phones:** on small screens the side panel becomes a bottom sheet.
@@ -50,7 +54,8 @@ data.police.uk bulk archive ──► Python pipeline ──► site/data/*.json
 3. **Bin.** Project coordinates to a Lambert azimuthal equal-area projection (the one Eurostat uses for its grids) and group crimes into hexagons, so every hexagon covers the same ground anywhere in the country.
 4. **Test.** Run Getis-Ord Gi\* on each hexagon and its six neighbours. Correct for testing thousands of areas at once with the Benjamini–Hochberg procedure (1% false discovery rate).
 5. **Group and rank.** Join neighbouring significant hexagons into zones, split very large zones into their densest cores, and rank zones by total harm.
-6. **Check.** Measure how stable hotspots are from month to month (Jaccard overlap), how concentrated harm is (share in the top 1% of areas), and which forces published no data.
+6. **Rank each month too.** Repeat steps 4 and 5 for every single month, and count how many of each month's top 10 hotspots overlap the 12-month top 10.
+7. **Check.** Measure how stable hotspots are from month to month (Jaccard overlap), how concentrated harm is (share in the top 1% of areas), and which forces published no data.
 
 ### Why not a clustering algorithm like HDBSCAN or K-means?
 
@@ -59,7 +64,36 @@ The first prototype used HDBSCAN on raw crime coordinates. Hotspot statistics tu
 - Police coordinates are snapped to a fixed set of anonymous points, so thousands of crimes share identical locations. Density-based clustering behaves oddly on repeated points.
 - Clustering counts every crime the same, while this project cares about harm.
 - Clusters have no built-in test of whether they're real or just where lots of people are. Gi\* gives a significance level for every area.
-- Clustering has no ground truth to evaluate against. The checks in step 6 can be measured and explained.
+- Clustering has no ground truth to evaluate against. The checks in step 7 can be measured and explained.
+
+---
+
+## Do hotspots move over time?
+
+Switch the map to **Month by month** and drag the month slider. Under the month bars, Gotham shows how many of that month's top 10 hotspots are also in the 12-month top 10.
+
+<!-- Fill in after the first build on real data: the overlap figures are in site/data/meta.json ("top10_overlap" for each month), and the overall month-to-month overlap is "stability". -->
+**Finding:** *to be filled in from the first real build.* For example: "In every month, at least _ of the top 10 hotspots were also in the 12-month top 10, and _% of hotspot cells stayed hotspots from one month to the next."
+
+This matches a well-documented pattern in criminology, sometimes called the "law of crime concentration": a small share of places accounts for a large share of crime, and those places stay much the same over time.
+
+---
+
+## Design: British road signs
+
+Gotham's look is borrowed from British road signs, the system designed by **Jock Kinneir** and **Margaret Calvert**. The site has a page about it: `site/road-signs.html` ("Why Gotham looks like a road sign").
+
+What I learned about it:
+
+- **Who and when.** In 1957 the Ministry of Transport set up the Anderson Committee to sign the new motorways, and hired Kinneir with Calvert, his former student, as designers. The signs were tested on the Preston bypass in 1958 and used on the M1 in 1959. The Worboys Committee extended the system to every other road in its July 1963 report, and it became law on 1 January 1965.
+- **Shape says what kind of sign it is.** Following a 1949 international agreement: triangles warn, circles give orders (red ring for "don't", blue for "do"), and rectangles inform.
+- **Colour says what kind of road it is.** Blue for motorways, green with yellow road numbers for primary routes, and black on white for other roads.
+- **A typeface for reading at speed.** Kinneir and Calvert drew Transport, a rounded typeface with details like the tails on the lowercase l and t, set in upper and lower case so words keep a recognisable shape.
+- **The pictograms have stories.** The girl on the "children crossing" sign is based on a photo of Calvert as a child, and the cow on the farm-animals sign was Patience, from her relatives' farm in Warwickshire. Calvert was appointed OBE in 2016.
+
+How Gotham uses it: hotspots are numbered warning triangles, the name sits on a motorway sign plate, harm runs from primary-route green through yellow to warning red, and notes about missing data are small white local signs.
+
+Sources: [Design Museum](https://designmuseum.org/designers/jock-kinneir-and-margaret-calvert), [Transport (typeface)](https://en.wikipedia.org/wiki/Transport_(typeface)), [Worboys Committee](https://en.wikipedia.org/wiki/Worboys_Committee), [Margaret Calvert](https://en.wikipedia.org/wiki/Margaret_Calvert).
 
 ---
 
@@ -76,9 +110,12 @@ gotham/
 │   └── __main__.py      # command-line entry point
 ├── site/                # static frontend (built with AI, see below)
 │   ├── index.html
+│   ├── road-signs.html  # "Why Gotham looks like a road sign"
 │   ├── app.css
-│   ├── app.js           # map layers, panel, popups
-│   ├── map.js           # small dependency-free map engine
+│   ├── app.js           # Leaflet map, layers, panel, popups, month-by-month view
+│   ├── hexgrid.js       # hexagon maths, spatial index and tile drawing
+│   ├── fonts/           # Transport Heavy and Atkinson Hyperlegible, self-hosted
+│   ├── vendor/leaflet/  # Leaflet 1.9.4, self-hosted
 │   └── data/            # generated by the pipeline, not committed
 ├── tests/               # pytest suite, including an end-to-end run on synthetic data
 ├── .github/workflows/deploy.yml
@@ -138,11 +175,12 @@ You don't need to store the raw data anywhere yourself: data.police.uk already h
 
 ## How AI was used
 
-**The frontend was built with AI.** Everything in the `site/` folder (`index.html`, `app.css`, `app.js` and `map.js`) was designed and written by Claude, Anthropic's AI model. This covers:
+**The frontend was built with AI.** Everything in the `site/` folder (`index.html`, `road-signs.html`, `app.css`, `app.js` and `hexgrid.js`) was designed and written by Claude, Anthropic's AI model. This covers:
 
-- the visual design: colour palette, typography, layout and the mobile bottom sheet;
-- the custom map engine in `map.js` (tiles, panning, zooming, touch and keyboard controls);
-- the hexagon rendering, hotspot outlines, popups, month selector and hotspot list in `app.js`;
+- the visual design: the road-sign identity, colour palette, typography, layout and the mobile bottom sheet;
+- the Leaflet map setup and the hexagon tile layer in `hexgrid.js` (spatial index and canvas drawing);
+- the hexagon rendering, hotspot triangles and outlines, popups, the month-by-month view and hotspot list in `app.js`;
+- the road-sign history page (`road-signs.html`), written from the sources listed in it;
 - accessibility and responsive behaviour.
 
 **My own work:** the original idea, data sourcing and first prototype (API scraper, neighbourhood boundaries and centroids, HDBSCAN clustering and a Leaflet map), plus reviewing, testing and deploying the final version.
@@ -160,5 +198,8 @@ You don't need to store the raw data anywhere yourself: data.police.uk already h
 ## Data and licences
 
 - Crime data: [data.police.uk](https://data.police.uk/). Contains public sector information licensed under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
-- Basemap: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, © [CARTO](https://carto.com/attributions).
-- Fonts: Big Shoulders Display and Atkinson Hyperlegible, via Google Fonts (SIL Open Font License).
+- Basemap: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, darkened with a CSS filter.
+- Map library: [Leaflet](https://leafletjs.com) (BSD-2-Clause), self-hosted in `site/vendor/leaflet/` with its licence.
+- Fonts (self-hosted, see `site/fonts/README.md`):
+  - **Transport Heavy**, from [AG Transport Heavy](https://github.com/smugpie/uk-ire-road-sign-fonts), derived from the Department for Transport's drawings (Crown Copyright, Open Government Licence).
+  - **Atkinson Hyperlegible** by the Braille Institute (SIL Open Font License).

@@ -5,52 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Gotham: where crime does the most harm in the UK</title>
   <meta name="description" content="A map of where reported crime causes the most harm across England, Wales and Northern Ireland, with statistically tested hotspots, built from data.police.uk.">
-  <meta name="theme-color" content="#13202f">
+  <meta name="theme-color" content="#0b3b7a">
   <meta property="og:title" content="Gotham: where crime does the most harm in the UK">
   <meta property="og:description" content="Severity-weighted crime hotspots from 12 months of police data, tested with Getis-Ord Gi*.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23f0a93a' d='M16 2l12 7v14l-12 7-12-7V9z'/%3E%3C/svg%3E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Big+Shoulders+Display:wght@700;900&display=swap">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 36'%3E%3Cpath d='M20 3 L37.5 33 H2.5 Z' fill='%23fff' stroke='%23c8102e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+  <link rel="preload" href="fonts/transport-heavy.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin>
   <link rel="preload" href="data/meta.json" as="fetch" crossorigin>
   <link rel="preload" href="data/district.json" as="fetch" crossorigin>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="app.css">
+  <script src="vendor/leaflet/leaflet.js" defer></script>
   <script type="module" src="app.js"></script>
 </head>
 <body>
   <main class="layout">
-    <div id="map" class="map" aria-describedby="map-help">
-      <p id="map-help" class="visually-hidden">The map colours each hexagon by recorded crime harm. Use the hotspot list for a text version of the most significant areas.</p>
-      <div class="zoom" role="group" aria-label="Zoom">
-        <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
-        <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
-      </div>
-      <div class="legend">
-        <p>Average monthly harm per km²</p>
-        <div id="legend-ramp" class="legend-ramp" aria-hidden="true"></div>
-        <p class="legend-ends"><span>Lower</span><span>Higher</span></p>
-        <p class="legend-hot"><span class="legend-outline" aria-hidden="true"></span>Tested hotspot</p>
-      </div>
-      <div id="popup" class="popup" hidden role="dialog" aria-label="Area details">
-        <button type="button" class="pop-close" aria-label="Close details">×</button>
-        <div class="pop-body"></div>
-      </div>
-    </div>
-
-    <aside class="sheet" aria-label="Map controls and hotspots">
+    <aside class="panel" aria-label="Map controls and hotspots">
       <button type="button" id="sheet-toggle" class="sheet-handle" aria-expanded="false" aria-controls="sheet-body">
-        <span class="visually-hidden">Show or hide hotspot list</span>
+        <span class="visually-hidden">Show or hide the hotspot list</span>
       </button>
-      <header class="intro">
-        <h1 class="wordmark">Gotham</h1>
-        <p class="lede">Where reported crime does the most harm across England, Wales and Northern Ireland.</p>
-        <p id="demo" class="demo" hidden>Demo build with synthetic data. Run the pipeline for real figures.</p>
+
+      <header class="plate">
+        <div class="plate-inner">
+          <h1>Gotham</h1>
+          <p class="lede"><span class="route">UK</span>Where reported crime does the most harm in England, Wales and Northern&nbsp;Ireland</p>
+        </div>
       </header>
+      <p class="history-link"><a href="road-signs.html">Why Gotham looks like a road sign</a></p>
+      <p id="demo" class="demo" hidden>Demo build with synthetic data. Run the pipeline for real figures.</p>
 
       <section class="period" aria-label="Time period">
-        <div id="scrubber" class="scrubber" role="group" aria-label="Recorded harm by month. Select a month to show it alone."></div>
-        <p class="period-line"><span id="period-text"></span> <button type="button" id="all-months" class="link" hidden>Show all months</button></p>
+        <div class="views" role="group" aria-label="View">
+          <button type="button" id="view-all" aria-pressed="true">All 12 months</button>
+          <button type="button" id="view-month" aria-pressed="false">Month by month</button>
+        </div>
+        <div id="scrubber" class="scrubber" role="group" aria-label="Recorded harm by month. Select a month to show it."></div>
+        <div id="slider-wrap" class="month-slider">
+          <input type="range" id="month-slider" min="0" max="11" step="1" value="0" aria-label="Month">
+          <div id="slider-dots" class="slider-dots" aria-hidden="true"></div>
+        </div>
+        <p id="period-text" class="period-line"></p>
+        <p id="overlap" class="overlap" hidden></p>
       </section>
 
       <div id="sheet-body" class="sheet-body">
@@ -58,15 +54,19 @@
 
         <section aria-labelledby="zones-title">
           <h2 id="zones-title">Worst hotspots</h2>
-          <p class="hint">Ranked by total harm. Select one to see it on the map.</p>
+          <p id="zones-hint" class="hint"></p>
           <ol id="zones" class="zones"></ol>
-          <button type="button" id="more-zones" class="more" hidden>Show 10 more</button>
+          <div class="list-buttons">
+            <button type="button" id="more-zones" class="more" hidden>Show 10 more</button>
+            <button type="button" id="fewer-zones" class="more" hidden>Show 10 fewer</button>
+            <button type="button" id="top-zones" class="more" hidden>Back to top 10</button>
+          </div>
         </section>
 
         <details class="method">
           <summary>How this map works</summary>
           <p>Every crime from data.police.uk is placed into a hexagon and multiplied by a harm weight, so one robbery counts for more than one shoplifting. Hexagons are equal in area everywhere, so a rural hexagon and a city hexagon are directly comparable.</p>
-          <p>A hotspot is a cluster of hexagons whose combined harm is far higher than chance would produce, tested with the Getis-Ord Gi* statistic and corrected for testing thousands of areas at once (1% false discovery rate).</p>
+          <p>A hotspot is a group of hexagons whose combined harm is far higher than chance would produce, tested with the Getis-Ord Gi* statistic and corrected for testing thousands of areas at once (1% false discovery rate).</p>
           <p id="stability"></p>
           <table class="weights">
             <caption>Harm weights (illustrative, editable in the pipeline)</caption>
@@ -83,12 +83,24 @@
         </details>
 
         <footer class="credits">
-          <p>Contains public sector information licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>, from <a href="https://data.police.uk/">data.police.uk</a>. Basemap © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>.</p>
+          <p>Crime data from <a href="https://data.police.uk/">data.police.uk</a>. Contains public sector information licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>.</p>
+          <p>Basemap © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors. Map library: <a href="https://leafletjs.com">Leaflet</a>. Lettering: Transport, by Jock Kinneir and Margaret Calvert, from Crown Copyright drawings (OGL), and Atkinson Hyperlegible by the Braille Institute.</p>
           <p id="generated"></p>
         </footer>
       </div>
       <p id="error" class="error" hidden>The map data hasn't been built yet. Run <code>python -m pipeline</code>, then reload this page.</p>
     </aside>
+
+    <p id="map-help" class="visually-hidden">The map colours each hexagon by recorded crime harm, from green for lower to red for higher. Warning triangles mark tested hotspots by rank. The hotspot list gives the same information as text.</p>
+    <div id="map" class="map" aria-describedby="map-help"></div>
+    <div id="legend" class="legend">
+      <div class="legend-inner">
+        <p>Average monthly harm per km²</p>
+        <div id="legend-ramp" class="legend-ramp" aria-hidden="true"></div>
+        <p class="legend-ends"><span>Lower</span><span>Higher</span></p>
+        <p class="legend-key"><svg viewBox="0 0 40 36" width="22" height="20" aria-hidden="true"><path d="M20 3 L37.5 33 H2.5 Z" fill="#fff" stroke="#c8102e" stroke-width="5" stroke-linejoin="round"/><text x="20" y="29" text-anchor="middle" font-family="Transport" font-size="17">1</text></svg><span class="mini-plate" aria-hidden="true">1</span>Tested hotspot, by rank</p>
+      </div>
+    </div>
   </main>
 </body>
 </html>

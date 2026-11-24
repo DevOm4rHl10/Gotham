@@ -64,6 +64,8 @@ def test_end_to_end(tmp_path):
     assert [m["month"] for m in meta["months"]] == ["2025-02", "2025-03"]
     assert any(f["id"] == "greater-manchester" for f in meta["coverage"]["missing"])
     assert zones and abs(zones[0]["center"][0] - 51.51) < 0.1  # London ranks first
+    month_zones = json.loads((out / "zones" / "2025-03.json").read_text())["zones"]
+    assert month_zones and 0 <= meta["months"][-1]["top10_overlap"] <= meta["months"][-1]["top10_count"]
     tiles = json.loads((out / "detail" / "index.json").read_text())["tiles"]
     assert all((out / "detail" / f"{t}.json").exists() for t in tiles)
 

@@ -7,6 +7,7 @@ Two sources:
   archive  the official monthly bulk download (recommended, complete)
   json     the crimes_YYYY-MM.json files from the old API scraper
 """
+import html
 import json
 import re
 import shutil
@@ -40,7 +41,19 @@ def download_archive(name="latest"):
     return path
 
 
+def _unescape(text):
+    """Some police names carry HTML entities, sometimes double-encoded (&amp;amp;)."""
+    text = str(text or "")
+    for _ in range(3):
+        decoded = html.unescape(text)
+        if decoded == text:
+            break
+        text = decoded
+    return text
+
+
 def _clean_place(location, area):
+    location, area = _unescape(location), _unescape(area)
     street = re.sub(r"^On or near\s+", "", str(location or "")).strip()
     if street.lower() in {"", "nan", "no location"}:
         street = ""

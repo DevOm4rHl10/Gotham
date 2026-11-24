@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why Gotham looks like a road sign</title>
+  <meta name="description" content="The story of the British road-sign system designed by Jock Kinneir and Margaret Calvert, which Gotham borrows its look from.">
+  <meta name="theme-color" content="#0b3b7a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 36'%3E%3Cpath d='M20 3 L37.5 33 H2.5 Z' fill='%23fff' stroke='%23c8102e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preload" href="fonts/transport-heavy.woff" as="font" type="font/woff" crossorigin>
+  <link rel="stylesheet" href="app.css">
+  <style>
+    body { overflow: auto; }
+    .story { max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
+    .back { display: inline-block; margin-bottom: 20px; font: 400 15px/1.2 var(--sign); color: var(--white); text-decoration: none; }
+    .back::before { content: "← "; }
+    .story .plate h1 { font-size: clamp(36px, 7vw, 56px); line-height: 1; }
+    .story h2 { font-size: 28px; margin: 40px 0 8px; }
+    .story p { font-size: 18px; line-height: 1.6; max-width: 62ch; color: #dbe4ef; }
+    .story p strong { color: var(--white); }
+
+    .timeline { list-style: none; padding: 0; margin: 20px 0 0; border-left: 3px solid var(--route); }
+    .timeline li { position: relative; padding: 0 0 18px 22px; font-size: 17px; line-height: 1.5; color: #dbe4ef; }
+    .timeline li::before { content: ""; position: absolute; left: -8px; top: 6px; width: 13px; height: 13px; border-radius: 50%; background: var(--route); }
+    .timeline b { display: block; font: 400 20px/1.2 var(--sign); color: var(--white); }
+
+    .shapes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-top: 18px; }
+    .shape { display: grid; grid-template-rows: 96px auto; justify-items: center; align-items: center; gap: 10px; padding: 18px 12px; text-align: center; background: var(--motorway-deep); border-radius: 10px; }
+    .shape b { font: 400 18px/1.2 var(--sign); }
+    .shape span { font-size: 15px; color: var(--mist); }
+
+    .colours { display: grid; gap: 12px; margin-top: 18px; }
+    .colour-sign { display: flex; align-items: center; gap: 14px; padding: 6px; border-radius: 12px; }
+    .colour-sign > div { flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-radius: 8px; border: 3px solid currentColor; }
+    .colour-sign b { font: 400 24px/1 var(--sign); }
+    .colour-sign small { font-size: 15px; }
+    .num { padding: 3px 8px 2px; border-radius: 3px; font: 400 18px/1 var(--sign); }
+    .motorway { background: var(--motorway); color: var(--white); }
+    .primary { background: var(--primary); color: var(--white); }
+    .primary .num { background: var(--primary); color: var(--route); }
+    .local { background: var(--white); color: var(--ink); }
+
+    .type-sample { margin-top: 18px; padding: 24px; background: var(--white); color: var(--ink); border-radius: 10px; }
+    .type-sample p { margin: 0; color: var(--ink); font: 400 clamp(32px, 6vw, 48px)/1.1 var(--sign); }
+    .type-sample small { display: block; margin-top: 8px; font-size: 14px; color: #333; }
+
+    .in-gotham { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 12px; }
+    .in-gotham li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; font-size: 17px; color: #dbe4ef; }
+    .sources { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--mist); }
+    .sources a { color: var(--mist); }
+    .sources ul { padding-left: 18px; }
+  </style>
+</head>
+<body>
+  <main class="story">
+    <a class="back" href="./">Back to the map</a>
+    <header class="plate"><div class="plate-inner">
+      <h1>Why Gotham looks like a road sign</h1>
+      <p class="lede">The design system that tells millions of people where to go, every day, without them noticing</p>
+    </div></header>
+
+    <p style="margin-top:28px">Gotham is a map of warnings, so it borrows the look of Britain's best-known warnings: its road signs. They were designed in the late 1950s and early 1960s by <strong>Jock Kinneir</strong> and his former student <strong>Margaret Calvert</strong>, and they are still in use today.</p>
+
+    <h2>A short history</h2>
+    <ol class="timeline">
+      <li><b>Before 1957</b>Britain's signs were a patchwork, with different shapes, colours and lettering depending on who had put them up.</li>
+      <li><b>1957</b>With the first motorways coming, the Ministry of Transport set up the Anderson Committee. It appointed Kinneir as designer, with Calvert as his assistant.</li>
+      <li><b>1958</b>The new motorway signs were tested on the Preston bypass, now part of the M6. A year later they went up on the M1.</li>
+      <li><b>July 1963</b>A second group, the Worboys Committee, published its report on signs for every other road, again with Kinneir and Calvert as designers.</li>
+      <li><b>1 January 1965</b>The new system became law.</li>
+      <li><b>2016</b>Calvert was appointed OBE for services to typography and road safety.</li>
+    </ol>
+
+    <h2>Shape tells you what kind of sign it is</h2>
+    <p>The system follows an international agreement from 1949, so a driver can read the type of a sign before reading what's on it.</p>
+    <div class="shapes">
+      <div class="shape">
+        <svg viewBox="0 0 40 36" width="100" height="90" aria-hidden="true"><path d="M20 3 L37.5 33 H2.5 Z" fill="#fff" stroke="#c8102e" stroke-width="4.5" stroke-linejoin="round"/></svg>
+        <div><b>Triangles warn</b><br><span>Red border, white inside</span></div>
+      </div>
+      <div class="shape">
+        <svg viewBox="0 0 40 40" width="90" height="90" aria-hidden="true"><circle cx="20" cy="20" r="16.5" fill="#fff" stroke="#c8102e" stroke-width="5"/></svg>
+        <div><b>Circles give orders</b><br><span>Red ring says don't, blue says do</span></div>
+      </div>
+      <div class="shape">
+        <svg viewBox="0 0 60 40" width="120" height="80" aria-hidden="true"><rect x="2" y="2" width="56" height="36" rx="5" fill="#0b3b7a"/><rect x="5.5" y="5.5" width="49" height="29" rx="3" fill="none" stroke="#fff" stroke-width="2"/></svg>
+        <div><b>Rectangles inform</b><br><span>Directions and places</span></div>
+      </div>
+    </div>
+
+    <h2>Colour tells you what kind of road it is</h2>
+    <div class="colours">
+      <div class="colour-sign motorway"><div><b>Motorways</b><span class="num">M1</span></div></div>
+      <div class="colour-sign primary"><div><b>Primary routes</b><span class="num">A1</span></div></div>
+      <div class="colour-sign local"><div><b>Other roads</b><small>Black on white</small></div></div>
+    </div>
+    <p>Primary-route signs put the road number in yellow, which is where the yellow "UK" on Gotham's own sign comes from.</p>
+
+    <h2>Letters built for reading at speed</h2>
+    <p>Kinneir and Calvert drew their own typeface, called <strong>Transport</strong>. It's rounder and friendlier than the harsh capitals used abroad, with small details that make letters easier to tell apart, such as the curled tail on the lowercase l and t. Signs use upper and lower case, because a word's outline is easier to recognise at a glance than a block of capitals.</p>
+    <div class="type-sample">
+      <p>Gotham, Leeds, Bristol</p>
+      <small>Set in Transport Heavy, the weight used for black lettering on white signs.</small>
+    </div>
+    <p>Calvert also drew many of the pictograms. The girl leading a boy on the "children crossing" sign is based on a photo of Calvert herself as a child, and the cow on the farm-animals sign was Patience, from her relatives' farm in Warwickshire.</p>
+
+    <h2>Where you'll see it in Gotham</h2>
+    <ul class="in-gotham">
+      <li><svg viewBox="0 0 40 36" width="44" height="40" aria-hidden="true"><path d="M20 3 L37.5 33 H2.5 Z" fill="#fff" stroke="#c8102e" stroke-width="5" stroke-linejoin="round"/><text x="20" y="29" text-anchor="middle" font-family="Transport" font-size="17">1</text></svg>Each tested hotspot is a warning triangle, numbered by rank.</li>
+      <li><svg viewBox="0 0 60 40" width="52" height="35" aria-hidden="true"><rect x="2" y="2" width="56" height="36" rx="5" fill="#0b3b7a"/><rect x="5.5" y="5.5" width="49" height="29" rx="3" fill="none" stroke="#fff" stroke-width="2.5"/></svg>The name sits on a motorway sign, with its white inset border.</li>
+      <li><svg viewBox="0 0 60 12" width="52" height="12" aria-hidden="true"><rect width="20" height="12" fill="#0d6b3f"/><rect x="20" width="20" height="12" fill="#ffd200"/><rect x="40" width="20" height="12" fill="#ff2a3a"/></svg>Harm runs from primary-route green through yellow to warning red.</li>
+      <li><svg viewBox="0 0 60 40" width="52" height="35" aria-hidden="true"><rect x="2" y="8" width="56" height="24" rx="4" fill="#fff"/><rect x="4.5" y="10.5" width="51" height="19" rx="2.5" fill="none" stroke="#000" stroke-width="1.5"/></svg>Notes on the map, like where data is missing, are small white local signs.</li>
+    </ul>
+
+    <p class="sources">The basic shapes and colours on this page are drawn for Gotham; they are not copies of official signs. Transport lettering from <a href="https://github.com/smugpie/uk-ire-road-sign-fonts">AG Transport Heavy</a>, derived from Crown Copyright drawings under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence</a>.</p>
+    <div class="sources">
+      <p>Sources</p>
+      <ul>
+        <li><a href="https://designmuseum.org/designers/jock-kinneir-and-margaret-calvert">Design Museum: Jock Kinneir and Margaret Calvert</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Transport_(typeface)">Wikipedia: Transport (typeface)</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Worboys_Committee">Wikipedia: Worboys Committee</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Margaret_Calvert">Wikipedia: Margaret Calvert</a></li>
+      </ul>
+    </div>
+  </main>
+</body>
+</html>
