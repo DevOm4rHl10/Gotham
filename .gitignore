@@ -1,3 +1,17 @@
-data/
+.cache/
+site/data/
+__pycache__/
+.pytest_cache/
+.venv/
 goth/
-__pycache__
+*.zip
+
+# local data from the old scraper
+/data/
+/backup/
+/HERE/
+
+# personal notes
+commands.txt
+remarks.txt
+installed_packages.txt
