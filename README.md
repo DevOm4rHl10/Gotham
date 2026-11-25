@@ -198,13 +198,7 @@ You don't need to store the raw data anywhere yourself: data.police.uk already h
 
 ## How AI was used
 
-**The frontend was built with AI.** Everything in the `site/` folder (`index.html`, `road-signs.html`, `app.css`, `app.js` and `hexgrid.js`) was designed and written by Claude, Anthropic's AI model. This covers:
-
-- the visual design: the road-sign identity, colour palette, typography, layout and the mobile bottom sheet;
-- the Leaflet map setup and the hexagon tile layer in `hexgrid.js` (spatial index and canvas drawing);
-- the hexagon rendering, hotspot triangles and outlines, popups, the month-by-month view and hotspot list in `app.js`;
-- the road-sign history page (`road-signs.html`), written from the sources listed in it;
-- accessibility and responsive behaviour.
+**The frontend was built with AI.** It was designed and written by Claude, Anthropic's AI model.
 
 **My own work:** the original idea, data sourcing and first prototype (API scraper, neighbourhood boundaries and centroids, HDBSCAN clustering and a Leaflet map), plus reviewing, testing and deploying the final version.
 
