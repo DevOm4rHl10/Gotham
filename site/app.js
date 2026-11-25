@@ -352,7 +352,7 @@ async function main() {
   const hexes = new HexLayer({ className: 'hexes', bounds: PAN_LIMIT, updateWhenZooming: false, keepBuffer: 3 }).addTo(map);
 
   // coverage notes, styled as small white local-road signs
-  const notes = [[56.6, -4.3, 'Scotland', 'Only British Transport Police data']];
+  const notes = [[56.6, -4.3, 'Scotland', 'No published data']];
   for (const f of state.meta.coverage.missing) if (f.at) notes.push([f.at[0], f.at[1], f.name, 'No published data']);
   const noteGroup = L.layerGroup(notes.map(([lat, lng, title, body]) => L.marker([lat, lng], {
     interactive: false, keyboard: false,

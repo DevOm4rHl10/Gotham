@@ -95,5 +95,5 @@ KNOWN_FORCES = {
 
 # Where to place an on-map note when a force has no data. lat, lng.
 COVERAGE_ANCHORS = {
-    "greater-manchester": (53.48, -2.24),
+    "greater-manchester": (53.58, -2.30),  # north of the centre, clear of nearby triangles
 }
