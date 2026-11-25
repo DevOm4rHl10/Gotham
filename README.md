@@ -180,9 +180,9 @@ The site is hosted on GitHub Pages and rebuilt by GitHub Actions, both free for 
 2. In the repository, go to **Settings → Pages → Build and deployment** and set **Source** to **GitHub Actions**.
 3. Push to `main`, or run the workflow by hand from the **Actions** tab.
 
-The workflow runs the tests, downloads the police archive, builds `site/data/`, and publishes the site. It runs again automatically on the 3rd of every month, after police.uk releases new data. Pushes that only change Markdown files, like this README, skip the rebuild.
+The workflow runs the tests, downloads the police archive, builds `site/data/`, and publishes the site. It runs again automatically on the 3rd of every month, after police.uk releases new data. Pushes that only change Markdown files or `screenshots/`, like this README, skip the rebuild.
 
-You don't need to store the raw data anywhere yourself: data.police.uk already hosts the archive, and the workflow downloads it on each run. The generated `site/data/` folder is ignored by git.
+You don't need to store the raw data anywhere yourself: data.police.uk already hosts the archive. Before each build the workflow checks `crime-last-updated`; if police.uk hasn't published a new month, it reuses the archive from GitHub's Actions cache instead of downloading it again. (GitHub drops cache entries unused for 7 days, so the monthly run usually downloads fresh data anyway, which it needs to.) The generated `site/data/` folder is ignored by git.
 
 ---
 
@@ -214,7 +214,6 @@ You don't need to store the raw data anywhere yourself: data.police.uk already h
 
 - Divide harm by population (ONS mid-year estimates join on the archive's LSOA codes) to show rate as well as volume.
 - Replace the illustrative weights with an official harm index.
-- Download the archive only when police.uk has published a new month (checking `crime-last-updated` first), instead of on every run.
 - Extend to Europe: the grid already uses Eurostat's projection, so European data on the same grid could be added.
 
 ---

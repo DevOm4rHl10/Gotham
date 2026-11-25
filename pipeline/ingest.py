@@ -32,7 +32,7 @@ def download_archive(name="latest"):
         print(f"Using cached {path}")
         return path
     url = ARCHIVE_URL.format(name=name)
-    print(f"Downloading {url} (large; one-off)...")
+    print(f"Downloading {url} (large; cached between runs in CI)...")
     tmp = path.with_suffix(".part")
     req = urllib.request.Request(url, headers={"User-Agent": "gotham-pipeline"})
     with urllib.request.urlopen(req, timeout=120) as resp, open(tmp, "wb") as out:
