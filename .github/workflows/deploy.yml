@@ -3,6 +3,11 @@ name: Build data and deploy
 on:
   push:
     branches: [main]
+    # Text-only changes (README, notes) don't need a rebuild
+    paths-ignore:
+      - "**/*.md"
+      - "*.md"
+      - "screenshots/**"
   schedule:
     - cron: "17 6 3 * *"   # monthly; police.uk publishes new data each month
   workflow_dispatch:
