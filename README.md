@@ -40,7 +40,7 @@ The site is fully static (HTML, CSS, JavaScript and JSON files). It has no serve
 - **Ranked list:** the worst hotspots, named by their most common street and area, from the top 10 up to 30. Select one to fly to it on the map.
 - **Two views:** *All 12 months* ranks hotspots over the whole year. *Month by month* ranks them for each single month, with a slider you drag through the year, so you can see whether hotspots move. Single months are shown with the 1.6 km hexagons at every zoom, but their hotspot outlines are still tested on 400 m cells.
 - **Area details:** click any hexagon to see its harm and whether it is a tested hotspot. At street level in the 12-month view, you also get its crime count, top crime types and a 12-month trend.
-- **Honest about gaps:** forces that publish no data are labelled on the map instead of looking crime-free.
+- **Honest about gaps:** areas with no published data are explained on the site instead of being passed off as crime-free (see [Limitations](#limitations)).
 - **Works on phones:** on small screens the side panel becomes a bottom sheet.
 - **Accessible:** keyboard controls for the map, visible focus, and reduced-motion support.
 
