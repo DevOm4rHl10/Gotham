@@ -353,10 +353,14 @@ async function main() {
 
   // coverage notes, styled as small white local-road signs
   const notes = [[56.6, -4.3, 'Scotland', 'No published data']];
-  for (const f of state.meta.coverage.missing) if (f.at) notes.push([f.at[0], f.at[1], f.name, 'No published data']);
-  const noteGroup = L.layerGroup(notes.map(([lat, lng, title, body]) => L.marker([lat, lng], {
+  for (const f of state.meta.coverage.missing) if (f.at) notes.push([f.at[0], f.at[1], f.name, 'No published data', f.at[2]]);
+  const ARROW = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const noteGroup = L.layerGroup(notes.map(([lat, lng, title, body, side]) => L.marker([lat, lng], {
     interactive: false, keyboard: false,
-    icon: L.divIcon({ className: 'map-note', iconSize: null, html: `<div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(body)}</span></div>` }),
+    icon: L.divIcon({
+      className: side === 'east' ? 'map-note point-east' : 'map-note', iconSize: null,
+      html: `<div><p><strong>${escapeHtml(title)}</strong><span>${escapeHtml(body)}</span></p>${side === 'east' ? ARROW : ''}</div>`,
+    }),
   })));
 
   let shownZones = null;

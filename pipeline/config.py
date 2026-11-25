@@ -95,5 +95,7 @@ KNOWN_FORCES = {
 
 # Where to place an on-map note when a force has no data. lat, lng.
 COVERAGE_ANCHORS = {
-    "greater-manchester": (53.58, -2.30),  # north of the centre, clear of nearby triangles
+    # (lat, lng, side): where the note sits on the map. "east" puts it out at sea,
+    # with an arrow pointing east to the area, so it never covers hotspot triangles.
+    "greater-manchester": (53.75, -3.55, "east"),
 }
